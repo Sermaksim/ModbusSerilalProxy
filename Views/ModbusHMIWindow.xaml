@@ -27,7 +27,7 @@
                 <ColumnDefinition Width="25*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Grid.ColumnSpan="2">
-                <TextBlock Text="Slave" HorizontalAlignment="Center" FontSize="20"/>
+                <TextBlock Text="Slave - COM7" HorizontalAlignment="Center" FontSize="20"/>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Адрес регистра"  Height="40" Width="180" Margin="10" FontSize="20"></TextBlock>
                     <TextBox Text="{Binding RegisterAddressSlave1, Mode=TwoWay}" Height="40"  Width="150"  VerticalAlignment="Center" Background="AliceBlue" FontSize="20"></TextBox>
@@ -41,7 +41,7 @@
 
             </StackPanel>
             <StackPanel Grid.Column="2">
-                <TextBlock Text="Server" HorizontalAlignment="Center" FontSize="20"/>
+                <TextBlock Text="Server - COM12" HorizontalAlignment="Center" FontSize="20"/>
                 <DataGrid ItemsSource="{Binding Reports}" Height="300" AutoGenerateColumns="True" >
                     
                 </DataGrid>

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModbusSerilalProxy.Services
@@ -41,7 +42,9 @@ namespace ModbusSerilalProxy.Services
 
                 slaveNetwork.AddSlave(slave1);
                 slaveNetwork.AddSlave(slave2);
-                await slaveNetwork.ListenAsync();
+              //  await slaveNetwork.ListenAsync();
+                await slaveNetwork.ListenWorkAroundAsync(new CancellationToken());
+
             }
         }
 
@@ -49,5 +52,29 @@ namespace ModbusSerilalProxy.Services
         {
             Debug.WriteLine($"Holding registers: {e.Operation} starting at {e.StartingAddress}");
         }
+    }
+
+    public static class ModbusSlaveDevice
+    {
+        //https://github.com/NModbus/NModbus/issues/71
+        public static async Task ListenWorkAroundAsync(this IModbusSlaveNetwork modbusSlaveNetwork, CancellationToken cancellationToken)
+        {
+            cancellationToken.Register(modbusSlaveNetwork.Dispose);
+            Action listen = () =>
+            {
+                try
+                {
+                    modbusSlaveNetwork.ListenAsync(cancellationToken);
+                }
+                catch (NullReferenceException)
+                {
+                    System.Diagnostics.Debug.WriteLine("Assuming shutdown of serial port.");
+                }
+            };
+
+            Task listenCompleteTask = Task.Factory.StartNew(listen, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            await listenCompleteTask.ConfigureAwait(false);
+        }
+
     }
 }
